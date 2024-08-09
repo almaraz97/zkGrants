@@ -1,20 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
 import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { SignMessage } from "~~/components/SignMessage";
 import { GenerateProof } from "~~/components/GenerateProof";
-import { useWalletClient } from "wagmi";
-// import { Address } from "~~/components/scaffold-eth";
-// import Semaphore
-// import XMTP
+import { SignMessage } from "~~/components/SignMessage";
 
 const Home: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
-  const { data } = useWalletClient();
-
   return (
     <>
       <div className="flex items-center flex-col flex-grow pt-10">
@@ -58,7 +49,7 @@ const Home: NextPage = () => {
               </p> */}
               <SignMessage></SignMessage>
             </div>
-              
+
             <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
               <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
               {/* <p>
