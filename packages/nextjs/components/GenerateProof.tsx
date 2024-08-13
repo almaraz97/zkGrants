@@ -38,9 +38,9 @@ export const GenerateProof = () => {
         </div>
         <div>
           <label htmlFor="groupId">Enter the grant ID</label>
-          <textarea id="groupId" name="groupId" placeholder="Grant ID..." />
+          <textarea id="groupId" name="groupId" placeholder="34" />
           <button className="flex" disabled={false}>
-            Vote to Release Funds
+            [Approve Fund Release]
           </button>
         </div>
       </form>

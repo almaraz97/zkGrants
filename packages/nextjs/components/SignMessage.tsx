@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Identity } from "@semaphore-protocol/core";
 import { getAccount, signMessage } from "@wagmi/core";
 import { SignableMessage } from "viem";
-//recoverMessageAddress,
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 // import { Client } from "@xmtp/xmtp-js";
@@ -44,24 +43,23 @@ export const SignMessage = () => {
           // await conversation.send(identity.commitment);
         }}
       >
-        <label htmlFor="message">Enter a grant ID to create your identifier</label>
+        <label htmlFor="message">Enter a grant name to create your private identifier:</label>
         <div>
-          <textarea id="message" name="message" placeholder="Proposal Name..." />
+          <textarea id="message" name="message" placeholder="pse-24" />
         </div>
         {messageState ? (
           <div className="flex flex-col">
             {/* <div>
               Signed Message (private key): {messageState}
             </div> */}
-            <div>Private Identity: {identityState}</div>
+            <div>
+              Private Identity:
+              <p className="width: 100%">{identityState}</p>
+            </div>
           </div>
         ) : (
-          <button className="flex" disabled={false}>
-            {" "}
-            {/* isLoading*/}Get Private Identifier
-          </button>
+          <button className="flex flex-col text-center items-center max-w-xs rounded-3xl">[Get Credentials]</button>
         )}
-
         {/* {messageState && } */}
         {/* {error && <div>{error.message}</div>} */}
       </form>
