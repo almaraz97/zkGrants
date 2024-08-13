@@ -1,3 +1,22 @@
+# ZK Grants
+Create an anonymous group, send escrowed tokens, and then vote on their release!
+
+## 🚀 Purpose
+Often, groups of people need to pool funds together for a common goal. However, there are many reasons why individuals may not want to reveal their identity to the group. This project aims to create a system where individuals can anonymously pool funds together, and then vote on the release of those funds.
+
+## 🛠️ Features
+### Anonymous voting
+[Semaphore](https://github.com/semaphore-protocol/semaphore/)
+ is used to generate private identities, aggregate them into a group, and then allow group members to vote by generating valid proofs.
+
+### Onchain escrow
+[Denota Protocol](https://github.com/denotalabs/denota-protocol) is used to escrow funds and set the conditions for their release. It uses NFTs to represent escrow ownership which can hold metadata about the escrow.
+
+### Flexible conditions
+Denota hooks allow for the creation of custom conditions for the release of funds. These conditions can be based on time, votes, or any other arbitrary logic.
+
+---
+
 # 🏗 Scaffold-ETH 2
 
 <h4 align="center">
