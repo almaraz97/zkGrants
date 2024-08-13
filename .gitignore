@@ -21,3 +21,7 @@ node_modules
 
 # cli
 dist
+
+.env
+.venv
+__pycache__
