@@ -4,64 +4,52 @@ import { useState } from "react";
 import { Identity } from "@semaphore-protocol/core";
 import { getAccount, signMessage } from "@wagmi/core";
 import { SignableMessage } from "viem";
+import { InputBase } from "~~/components/scaffold-eth";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
-// import { Client } from "@xmtp/xmtp-js";
-// import { set } from 'nprogress';
-
-// import { InputBase } from "~~/components/scaffold-eth"; // Change to InputBase
 export const SignMessage = () => {
   const { connector } = getAccount(wagmiConfig);
-  const [messageState, setMessageState] = useState("");
-  const [identityState, setIdentityState] = useState("");
+  const [messageState, setMessageState] = useState<string>();
+  const [signedMessageState, setSignedMessageState] = useState<string>();
+  const [identityState, setIdentityState] = useState<string>();
 
-  // const signer = ""
-  // // Create the client with your wallet. This will connect to the XMTP development network by default
-  // const xmtp = await Client.create(signer, { env: "dev" });
-  // // Start a conversation with XMTP
-  // const conversation = await xmtp.conversations.newConversation(
-  // "0xd20E342dB297646a500A980088723C9E8af9810d",  // almaraz.eth
-  // );
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.target as HTMLFormElement);
+    const message = formData.get("message")?.toString();
+    if (!message) {
+      return;
+    }
+    try {
+      const result = await signMessage(wagmiConfig, {
+        connector,
+        message: message as SignableMessage,
+      });
+      setSignedMessageState(result);
+      const identity = new Identity(signedMessageState);
+      setIdentityState(identity.commitment.toString());
+    } catch (error) {
+      console.error("Error signing message:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col">
-      <form
-        onSubmit={async event => {
-          event.preventDefault();
-          const formData = new FormData(event.target as HTMLFormElement);
-          const message = formData.get("message")?.toString();
-          if (!message) {
-            return;
-          }
-          const result = await signMessage(wagmiConfig, {
-            connector,
-            message: message as SignableMessage,
-          });
-          setMessageState(result);
-          const identity = new Identity(messageState);
-          setIdentityState(identity.commitment.toString());
-          // await conversation.send(identity.commitment);
-        }}
-      >
-        <label htmlFor="message">Enter a grant name to create your private identifier:</label>
-        <div>
-          <textarea id="message" name="message" placeholder="pse-24" />
-        </div>
-        {messageState ? (
-          <div className="flex flex-col">
-            {/* <div>
-              Signed Message (private key): {messageState}
-            </div> */}
-            <div>
-              Private Identity:
-              <p className="width: 100%">{identityState}</p>
-            </div>
+      <form onSubmit={handleSubmit}>
+        {signedMessageState ? (
+          <div>
+            Private Identity:
+            <p className="flex-row break-all">{identityState}</p>
           </div>
         ) : (
-          <button className="flex flex-col text-center items-center max-w-xs rounded-3xl">[Get Credentials]</button>
+          <div>
+            <div className="mb-2">
+              <label htmlFor="message">Enter a grant name to create your private identifier:</label>
+            </div>
+            <InputBase name="message" placeholder="pse-24" value={messageState} onChange={setMessageState} />
+            <button className="btn mt-2">Get Identity</button>
+          </div>
         )}
-        {/* {messageState && } */}
-        {/* {error && <div>{error.message}</div>} */}
       </form>
     </div>
   );
