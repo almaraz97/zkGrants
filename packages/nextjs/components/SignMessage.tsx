@@ -46,7 +46,7 @@ export const SignMessage = () => {
             <div className="mb-2">
               <label htmlFor="message">Enter a grant name to create your private identifier:</label>
             </div>
-            <InputBase name="message" placeholder="pse-24" value={messageState} onChange={setMessageState} />
+            <InputBase name="message" placeholder="Grant ID" value={messageState} onChange={setMessageState} />
             <button className="btn mt-2">Get Identity</button>
           </div>
         )}

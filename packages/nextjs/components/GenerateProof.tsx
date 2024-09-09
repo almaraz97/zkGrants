@@ -2,6 +2,7 @@
 
 import { Group, Identity, generateProof } from "@semaphore-protocol/core";
 import { SemaphoreSubgraph } from "@semaphore-protocol/data";
+import { InputBase } from "~~/components/scaffold-eth";
 
 export const GenerateProof = () => {
   const semaphoreSubgraph = new SemaphoreSubgraph("sepolia");
@@ -33,14 +34,13 @@ export const GenerateProof = () => {
         }}
       >
         <div>
-          <label htmlFor="pk">Enter Your identity</label>
-          <textarea id="pk" name="pk" placeholder="Private Identifier..." />
+          Cast vote onchain
+          <InputBase name="pk" value="Private Identifier..." onChange={() => null} />
         </div>
         <div>
-          <label htmlFor="groupId">Enter the grant ID</label>
-          <textarea id="groupId" name="groupId" placeholder="34" />
-          <button className="flex" disabled={false}>
-            [Approve Fund Release]
+          <InputBase name="groupId" value="Grant ID" onChange={() => null} />
+          <button className="btn mt-2" disabled={false}>
+            Vote to Release
           </button>
         </div>
       </form>
