@@ -1,10 +1,15 @@
 "use client";
 
+import { FC } from "react";
 import { Group, Identity, generateProof } from "@semaphore-protocol/core";
 import { SemaphoreSubgraph } from "@semaphore-protocol/data";
-import { InputBase } from "~~/components/scaffold-eth";
 
-export const GenerateProof = () => {
+interface GenerateProofProps {
+  identity: Identity | undefined;
+  grantId: string | undefined;
+}
+
+const GenerateProof: FC<GenerateProofProps> = ({ identity, grantId }) => {
   const semaphoreSubgraph = new SemaphoreSubgraph("sepolia");
 
   return (
@@ -12,20 +17,12 @@ export const GenerateProof = () => {
       <form
         onSubmit={async event => {
           event.preventDefault();
-          const formData = new FormData(event.target as HTMLFormElement);
-          const pk = formData.get("pk")?.toString();
-          const groupId = formData.get("groupId")?.toString();
-          console.log(pk, groupId);
-          if (!pk || !groupId) {
+          if (!identity || !grantId) {
             return;
           }
 
-          const identity = new Identity(pk);
-          // setIdentityState(identity)
-          const { members } = await semaphoreSubgraph.getGroup(groupId, { members: true });
-          // setGroupState(members);
+          const { members } = await semaphoreSubgraph.getGroup(grantId, { members: true });
           const group = new Group(members);
-          console.log(group);
 
           const scope = group.root;
           const message = 1;
@@ -33,12 +30,8 @@ export const GenerateProof = () => {
           console.log(proof);
         }}
       >
+        <div>Cast vote onchain</div>
         <div>
-          Cast vote onchain
-          <InputBase name="pk" value="Private Identifier..." onChange={() => null} />
-        </div>
-        <div>
-          <InputBase name="groupId" value="Grant ID" onChange={() => null} />
           <button className="btn mt-2" disabled={false}>
             Vote to Release
           </button>
@@ -47,3 +40,5 @@ export const GenerateProof = () => {
     </div>
   );
 };
+
+export { GenerateProof };
