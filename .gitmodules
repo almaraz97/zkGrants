@@ -10,3 +10,6 @@
 [submodule "packages/foundry/lib/semaphore"]
 	path = packages/foundry/lib/semaphore
 	url = https://github.com/semaphore-protocol/semaphore
+[submodule "packages/foundry/lib/v1-periphery"]
+	path = packages/foundry/lib/v1-periphery
+	url = https://github.com/denotalabs/v1-periphery

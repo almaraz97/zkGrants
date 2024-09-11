@@ -1,2 +1,4 @@
 @openzeppelin/contracts/=lib/openzeppelin-contracts/contracts
+openzeppelin/=lib/openzeppelin-contracts/contracts
 semaphore=lib/semaphore/packages/contracts/contracts
+v1-periphery=lib/v1-periphery/contracts
