@@ -7,23 +7,7 @@ import
   "../lib/semaphore/packages/contracts/contracts/interfaces/ISemaphoreGroups.sol";
 import "v1-periphery/BaseHook.sol";
 
-/**
- * Ways to combine releases
- * - Linear
- * - Cliff
- * - Cliff --> linear
- * - Zero if vote threshold not reached, and max payout within a time, after that time payout reduces linearly
- *
- * Vote threshold, grace period to get threshold, then linear decay
- */
-/**
- * Assume group already exists?
- * Assume all members have already joined?
- * Assume all money is escrowed already?
- * Assume more members won't join?
- * Assume each signature is sent here before passing to the Semaphore contract?
- * Assume a vote is a yes and not voting is a no? No negative votes.
- */
+// If the writer provides a 0 groupId the will be set as the admin of the group assigned that Nota
 contract SemaphoreRelease is BaseHook {
   struct NotaData {
     uint256 grantAmount;
@@ -76,6 +60,10 @@ contract SemaphoreRelease is BaseHook {
     ) = abi.decode(hookData, (uint256, uint8, string, string, string, string));
     if (voterThreshold == 0) revert ZeroVoterThreshold();
 
+    if (groupId == 0) {
+      groupId = _semaphore.createGroup(caller);
+    }
+
     notaDatas[nota.id] = NotaData(
       nota.escrowed,
       groupId,
@@ -86,9 +74,6 @@ contract SemaphoreRelease is BaseHook {
       externalURI,
       imageURI
     );
-    if (
-      ISemaphoreGroups(address(_semaphore)).getGroupAdmin(groupId) == address(0)
-    ) _semaphore.createGroup(caller);
 
     emit GrantCreated(
       nota.id,
@@ -143,15 +128,15 @@ contract SemaphoreRelease is BaseHook {
       this.beforeTokenURI.selector,
       string(
         abi.encodePacked(
-          ',{"trait_type":"Group Id","value":"',
+          ',{"trait_type":"Committee Id","value":"',
           Strings.toString(notaData.groupId),
-          '"},{"trait_type":"Group Admin","value":"',
+          '"},{"trait_type":"Committee Admin","value":"',
           Strings.toHexString(groupAdmin),
           '"},{"trait_type":"Vote Threshold","value":"',
           Strings.toString(notaData.voterThreshold),
-          '"},{"trait_type":"Votes","value":"',
+          '"},{"trait_type":"Total Votes","value":"',
           Strings.toString(notaData.voteTotal),
-          '"},{"trait_type":"Group Size","value":"',
+          '"},{"trait_type":"Committee Size","value":"',
           Strings.toString(size),
           '"}'
         )
