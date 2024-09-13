@@ -12,6 +12,7 @@ contract SemaphoreRelease is BaseHook {
   struct NotaData {
     uint256 grantAmount;
     uint256 groupId;
+    uint96 expirationDate;
     uint8 voterThreshold;
     uint8 voteTotal;
     string title;
@@ -37,7 +38,7 @@ contract SemaphoreRelease is BaseHook {
     string imageURI
   );
 
-  constructor(address registrar) BaseHook(registrar) {
+  constructor() BaseHook(0x00002bCC9B3e92a59207C43631f3b407AE5bBd0B) {
     _semaphore = ISemaphore(0x1e0d7FF1610e480fC93BdEC510811ea2Ba6d7c2f);
   }
 
@@ -60,13 +61,19 @@ contract SemaphoreRelease is BaseHook {
     ) = abi.decode(hookData, (uint256, uint8, string, string, string, string));
     if (voterThreshold == 0) revert ZeroVoterThreshold();
 
+    // TODO this reverts InvalidHookResponse() for some reason
     if (groupId == 0) {
       groupId = _semaphore.createGroup(caller);
+      require(
+        ISemaphoreGroups(address(_semaphore)).getGroupAdmin(groupId) != caller,
+        "Invalid group"
+      );
     }
 
     notaDatas[nota.id] = NotaData(
       nota.escrowed,
       groupId,
+      uint96(block.timestamp + 5 days),
       voterThreshold,
       0,
       title,
@@ -136,6 +143,8 @@ contract SemaphoreRelease is BaseHook {
           Strings.toString(notaData.voterThreshold),
           '"},{"trait_type":"Total Votes","value":"',
           Strings.toString(notaData.voteTotal),
+          '"},{"trait_type":"Expiration Date","display_type":"date","value":"',
+          Strings.toString(notaData.expirationDate),
           '"},{"trait_type":"Committee Size","value":"',
           Strings.toString(size),
           '"}'

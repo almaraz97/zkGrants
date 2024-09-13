@@ -10,18 +10,14 @@ deploy:
 	forge compile --optimizer-runs ${optimizer_runs}
 
 	set -e ; \
-	registrarAddress=0x00002bCC9B3e92a59207C43631f3b407AE5bBd0B ; \
+	registrarAddress="0x00002bCC9B3e92a59207C43631f3b407AE5bBd0B" ; \
 	constructorArgs=$$(cast abi-encode "constructor(address)" $${registrarAddress}) ; \
 	constructorArgs=$$(echo $${constructorArgs} | sed 's/0x//') ; \
 	echo "Constructor Args: "$${constructorArgs} ; \
 	bytecode=$$(jq -r '.bytecode.object' out/$(hookFileName).sol/$(hookFileName).json)$${constructorArgs} ; \
 	echo $${bytecode} ; \
-	echo "Bytecode Formatted.." ; \
-	cast create2 --deployer ${FACTORY_ADDRESS} --init-code $${bytecode} --starts-with 0000 --caller ${ADDRESS} 2>&1 | tee $(hookFileName).salt.txt ; \
-	echo "\n\n" ; \
-	salt=$$(cat $(hookFileName).salt.txt | grep "Salt: " | awk '{print $$2}') ; \
-	hookAddress=$$(cat $(hookFileName).salt.txt | grep "Address: " | awk '{print $$2}') ; \
-	cast send ${FACTORY_ADDRESS} "safeCreate2(bytes32,bytes calldata)" $${salt} $${bytecode} --private-key ${PRIVATE_KEY} --rpc-url ${DEPLOY_RPC_URL}; 
+	cast send --chain 11155111 --private-key ${PRIVATE_KEY} --rpc-url ${DEPLOY_RPC_URL} --create $${bytecode} 
+#  ; 
 
 # \
 # echo "Address deployed on blockchain.\nVerifying...\n\n" ; \
@@ -46,3 +42,25 @@ verify:
 	$${hookAddress} \
 	contracts/$(hookFileName).sol:$(hookFileName) ; \
 	echo "Contract verified."
+
+deploy2:
+	forge build --optimizer-runs ${optimizer_runs}
+
+	set -e ; \
+	registrarAddress="0x00002bCC9B3e92a59207C43631f3b407AE5bBd0B" ; \
+	constructorArgs=$$(cast abi-encode "constructor(address)" $${registrarAddress}) ; \
+	constructorArgs=$$(echo $${constructorArgs} | sed 's/0x//') ; \
+	echo ; \
+	echo ; \
+	bytecode=$$(jq -r '.bytecode.object' out/$(hookFileName).sol/$(hookFileName).json)$${constructorArgs} ; \
+	echo $${bytecode} ; \
+	echo ; \
+	echo ; \
+	cast create2 --deployer ${FACTORY_ADDRESS} --init-code $${bytecode} --starts-with 0000 --caller ${ADDRESS} 2>&1 | tee $(hookFileName).salt.txt ; \
+	echo ; \
+	echo ; \
+	salt=$$(cat $(hookFileName).salt.txt | grep "Salt: " | awk '{print $$2}') ; \
+	echo ; \
+	echo ; \
+	hookAddress=$$(cat $(hookFileName).salt.txt | grep "Address: " | awk '{print $$2}') ; \
+	cast send ${FACTORY_ADDRESS} "safeCreate2(bytes32,bytes calldata)" $${salt} $${bytecode} --private-key ${PRIVATE_KEY} --rpc-url ${DEPLOY_RPC_URL} ;
