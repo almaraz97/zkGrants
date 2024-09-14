@@ -4,30 +4,62 @@ import { FC } from "react";
 import { Group, Identity, generateProof } from "@semaphore-protocol/core";
 import { SemaphoreSubgraph } from "@semaphore-protocol/data";
 
+// import { http, createConfig, writeContract } from '@wagmi/core'
+// import { sepolia } from '@wagmi/core/chains'
+
 interface GenerateProofProps {
+  semaphoreSubgraph: SemaphoreSubgraph | undefined;
   identity: Identity | undefined;
   grantId: string | undefined;
+  groupId: string | undefined;
+  notaOwner: string | undefined;
 }
 
-const GenerateProof: FC<GenerateProofProps> = ({ identity, grantId }) => {
-  const semaphoreSubgraph = new SemaphoreSubgraph("sepolia");
-
+const GenerateProof: FC<GenerateProofProps> = ({ semaphoreSubgraph, identity, grantId, groupId, notaOwner }) => {
   return (
     <div className="flex flex-col">
       <form
         onSubmit={async event => {
           event.preventDefault();
-          if (!identity || !grantId) {
+          if (!identity || !groupId || !grantId || !notaOwner || !semaphoreSubgraph) {
             return;
           }
+          console.log(identity, groupId);
 
-          const { members } = await semaphoreSubgraph.getGroup(grantId, { members: true });
+          const { members } = await semaphoreSubgraph.getGroup(groupId, { members: true });
           const group = new Group(members);
 
-          const scope = group.root;
           const message = 1;
-          const proof = await generateProof(identity, group, message, scope);
+          const proof = await generateProof(identity, group, message, grantId);
           console.log(proof);
+
+          // const config = createConfig({
+          //   chains: [sepolia],
+          //   transports: {
+          //     [sepolia.id]: http(),
+          //   },
+          // })
+
+          // const result = await writeContract(config, {
+          //   abi: [], // TODO add denota abi
+          //   address: '0x00002bCC9B3e92a59207C43631f3b407AE5bBd0B',  // denotaSDK.denotaContracts["registrar"].address
+          //   functionName: 'cash',
+          //   args: [
+          //     BigInt(grantId),
+          //     BigInt(100), // TODO compute how much can be cashed
+          //     `0x${notaOwner}`, // to
+          //     // Need to abi.encode this
+          //     // encodeAbiParameters(
+          //     //   [
+          //     //     { name: 'merkleTreeDepth', type: 'uint256' },
+          //     //     { name: 'merkleTreeRoot', type: 'uint256' },
+          //     //     // { name: 'z', type: 'bool' }
+          //     //   ],
+          //     //   // [BigInt(proof.merkleTreeDepth), proof.merkleTreeRoot, proof.nullifier, proof.scope, proof.points]
+          //     // ),
+          //     `0x{proof}`, // TODO insert proof here
+          //   ],
+          // })
         }}
       >
         <div>Cast vote onchain</div>
