@@ -3,14 +3,17 @@
 import { useState } from "react";
 import { FC } from "react";
 import { Identity } from "@semaphore-protocol/core";
-import { getAccount, signMessage } from "@wagmi/core";
+import { Connector, signMessage } from "@wagmi/core";
 import { Alchemy, Network } from "alchemy-sdk";
 import { SignableMessage } from "viem";
+import { IdentificationIcon } from "@heroicons/react/24/outline";
 import { InputBase } from "~~/components/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 interface SignMessageProps {
+  connector: Connector | undefined;
+  identityState: string | undefined;
   setIdentityState: (identity: Identity) => void;
   setGrantIdState: (grantId: string) => void;
   setNotaOwnerState: (notaOwner: string) => void;
@@ -18,12 +21,13 @@ interface SignMessageProps {
 }
 
 const SignMessage: FC<SignMessageProps> = ({
+  connector,
+  identityState,
   setIdentityState,
   setGrantIdState,
   setGroupIdState,
   setNotaOwnerState,
 }) => {
-  const { connector } = getAccount(wagmiConfig);
   const [messageState, setMessageState] = useState<string>("");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -38,7 +42,7 @@ const SignMessage: FC<SignMessageProps> = ({
 
     const notaMetadata = (
       await alchemy.nft.getNftMetadata(
-        "0x00002bCC9B3e92a59207C43631f3b407AE5bBd0B", // denotaSDK.denotaContracts["registrar"].address
+        "0x00002bCC9B3e92a59207C43631f3b407AE5bBd0B", // denotaSDK.denotaContracts["registrar"].address  // TODO need this to be programmatic
         messageState,
       )
     ).raw.tokenUri;
@@ -69,16 +73,26 @@ const SignMessage: FC<SignMessageProps> = ({
   };
 
   return (
-    <div className="flex flex-col">
-      <form onSubmit={handleSubmit}>
+    <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
+      <IdentificationIcon className="h-8 w-8 fill-secondary" />
+      {identityState ? (
         <div>
-          <div className="mb-2">
-            <label htmlFor="message">Enter the grant ID to create your private identifier:</label>
-          </div>
-          <InputBase name="message" placeholder="Grant ID" value={messageState} onChange={setMessageState} />
-          <button className="btn mt-2">Get Identity</button>
+          Private Identity:
+          <p className="flex-row break-all">{identityState}</p>
         </div>
-      </form>
+      ) : (
+        <div className="flex flex-col">
+          <form onSubmit={handleSubmit}>
+            <div>
+              <div className="mb-2">
+                <label htmlFor="message">Enter the grant ID to create your private identifier:</label>
+              </div>
+              <InputBase name="message" placeholder="Grant ID" value={messageState} onChange={setMessageState} />
+              <button className="btn mt-2">Get Identity</button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
