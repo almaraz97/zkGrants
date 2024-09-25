@@ -9,14 +9,28 @@ import { CheckIcon } from "@heroicons/react/24/outline";
 // import { sepolia } from '@wagmi/core/chains'
 
 interface GenerateProofProps {
-  semaphoreSubgraph: SemaphoreSubgraph | undefined;
+  chainName: string | undefined;
   identity: Identity | undefined;
   grantId: string | undefined;
   groupId: string | undefined;
   notaOwner: string | undefined;
 }
 
-const GenerateProof: FC<GenerateProofProps> = ({ semaphoreSubgraph, identity, grantId, groupId, notaOwner }) => {
+const GenerateProof: FC<GenerateProofProps> = ({ chainName, identity, grantId, groupId, notaOwner }) => {
+  // TODO make more programmatic with Semaphore's supported chain dict
+  const chainNameFormatted = chainName?.replace(" ", "-").toLowerCase();
+  let semaphoreSubgraph: SemaphoreSubgraph | undefined = undefined;
+  if (
+    chainNameFormatted === "sepolia" ||
+    chainName === "arbitrum-sepolia" ||
+    chainName === "optimism-sepolia" ||
+    chainName === "matic-amoy"
+  ) {
+    semaphoreSubgraph = new SemaphoreSubgraph(chainName);
+  } else {
+    console.error("Failed to initialize SemaphoreSubgraph");
+  }
+
   const generateProofAndVote = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!identity || !groupId || !grantId || !notaOwner || !semaphoreSubgraph) {

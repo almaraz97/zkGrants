@@ -16,6 +16,7 @@ interface SignMessageProps {
   identityState: string | undefined;
   setIdentityState: (identity: Identity) => void;
   setGrantIdState: (grantId: string) => void;
+  setNotaAdminState: (notaAdmin: string) => void;
   setNotaOwnerState: (notaOwner: string) => void;
   setGroupIdState: (notaMetadata: string) => void;
 }
@@ -26,6 +27,7 @@ const SignMessage: FC<SignMessageProps> = ({
   setIdentityState,
   setGrantIdState,
   setGroupIdState,
+  setNotaAdminState,
   setNotaOwnerState,
 }) => {
   const [messageState, setMessageState] = useState<string>("");
@@ -55,11 +57,13 @@ const SignMessage: FC<SignMessageProps> = ({
     setNotaOwnerState(notaOwner.owners[0]);
 
     const notaMetadataJSON = JSON.parse(Buffer.from(notaMetadata.split(",")[1], "base64").toString("utf-8"));
-    console.log(notaMetadataJSON);
+    // console.log(notaMetadataJSON);
     const groupId = notaMetadataJSON["attributes"][3]["value"]; // TODO need to iterate through this list and pull out the item with this trait_type and then index it's value
+    const admin = notaMetadataJSON["Committee Admin"];
 
     setGroupIdState(groupId);
     setGrantIdState(messageState);
+    setNotaAdminState(admin);
     try {
       const result = await signMessage(wagmiConfig, {
         connector,
