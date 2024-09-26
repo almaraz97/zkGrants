@@ -1,60 +1,41 @@
-import React, { FC, useEffect, useState } from "react";
-import { getDefaultProvider } from "@ethersproject/providers";
+import { FC } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
 // import { Client } from "@xmtp/xmtp-js";
 
 interface JoinGroupProps {
-  accountState: string | undefined;
-  notaAdminState: string | undefined;
+  accountAddress: string | undefined;
+  notaAdmin: string | undefined;
+  adminTelegramAddress: string | undefined;
 }
 
-const JoinGroup: FC<JoinGroupProps> = ({ accountState, notaAdminState }) => {
-  const [telegramAddress, setTelegramAddress] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchTelegramAddress = async () => {
-      if (!accountState || !notaAdminState) return;
-
-      try {
-        const provider = getDefaultProvider();
-        const resolver = await provider.getResolver(accountState.toString()); // notaAdminState
-        console.log(resolver);
-        const telegram = await resolver?.getText("telegram");
-        console.log("Telegram:", telegram);
-        setTelegramAddress(telegram || null);
-      } catch (error) {
-        console.error("Error fetching ENS record:", error);
-      }
-    };
-
-    fetchTelegramAddress();
-  }, [accountState, notaAdminState]);
-
+const JoinGroup: FC<JoinGroupProps> = ({ accountAddress, notaAdmin, adminTelegramAddress }) => {
   const sendXMTPMessage = async () => {
-    // try {
-    //   const xmtp = await Client.create(accountState);
-    //   const conversation = await xmtp.conversations.newConversation(notaAdminState);
-    //   await conversation.send("Send private ID through Telegram to the group admin");
-    // } catch (error) {
-    //   console.error("Error sending XMTP message:", error);
-    // }
+    try {
+      console.log(accountAddress, notaAdmin);
+      //   const xmtp = await Client.create(accountAddress);
+      //   const conversation = await xmtp.conversations.newConversation(notaAdmin);
+      //   await conversation.send(Hey, add me to the voting group {ID}, {privateId}!);
+    } catch (error) {
+      console.error("Error sending XMTP message:", error);
+    }
   };
 
   return (
-    <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
+    <>
       <PaperAirplaneIcon className="h-8 w-8 fill-secondary" />
-      Send private ID through Telegram to the group admin
-      {telegramAddress ? (
-        <a href={`https://t.me/${telegramAddress}`} target="_blank" rel="noreferrer noopener">
-          <button className="btn mt-2">Join Group</button>
+      Send the admin your private ID to be added to the voting group.
+      {/* TODO put privateId in here so they can copy and paste. Can auto send it */}
+      {adminTelegramAddress ? (
+        <a href={`https://t.me/${adminTelegramAddress}`} target="_blank" rel="noreferrer noopener">
+          <button className="btn mt-2">Admin&apos;s Telegram</button>
         </a>
       ) : (
         <button className="btn mt-2" onClick={sendXMTPMessage}>
-          Join Group
+          Admin&apos;s XMTP
         </button>
       )}
-    </div>
+    </>
   );
 };
 

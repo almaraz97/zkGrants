@@ -2,44 +2,27 @@
 
 import { FC } from "react";
 import { Group, Identity, generateProof } from "@semaphore-protocol/core";
-import { SemaphoreSubgraph } from "@semaphore-protocol/data";
+// import { SemaphoreSubgraph } from "@semaphore-protocol/data";
 import { CheckIcon } from "@heroicons/react/24/outline";
 
 // import { http, createConfig, writeContract } from '@wagmi/core'
 // import { sepolia } from '@wagmi/core/chains'
 
 interface GenerateProofProps {
-  chainName: string | undefined;
+  group: Group | undefined;
   identity: Identity | undefined;
   grantId: string | undefined;
   groupId: string | undefined;
   notaOwner: string | undefined;
 }
 
-const GenerateProof: FC<GenerateProofProps> = ({ chainName, identity, grantId, groupId, notaOwner }) => {
-  // TODO make more programmatic with Semaphore's supported chain dict
-  const chainNameFormatted = chainName?.replace(" ", "-").toLowerCase();
-  let semaphoreSubgraph: SemaphoreSubgraph | undefined = undefined;
-  if (
-    chainNameFormatted === "sepolia" ||
-    chainName === "arbitrum-sepolia" ||
-    chainName === "optimism-sepolia" ||
-    chainName === "matic-amoy"
-  ) {
-    semaphoreSubgraph = new SemaphoreSubgraph(chainName);
-  } else {
-    console.error("Failed to initialize SemaphoreSubgraph");
-  }
-
+const GenerateProof: FC<GenerateProofProps> = ({ group, identity, grantId, groupId, notaOwner }) => {
   const generateProofAndVote = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!identity || !groupId || !grantId || !notaOwner || !semaphoreSubgraph) {
+    if (!identity || !groupId || !grantId || !notaOwner || !group) {
       return;
     }
     console.log(identity, groupId);
-
-    const { members } = await semaphoreSubgraph.getGroup(groupId, { members: true });
-    const group = new Group(members);
 
     const message = 1;
     const proof = await generateProof(identity, group, message, grantId);
@@ -75,7 +58,7 @@ const GenerateProof: FC<GenerateProofProps> = ({ chainName, identity, grantId, g
   };
 
   return (
-    <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
+    <>
       <CheckIcon className="h-8 w-8 fill-secondary" />
       <div className="flex flex-col">
         <form onSubmit={generateProofAndVote}>
@@ -87,7 +70,7 @@ const GenerateProof: FC<GenerateProofProps> = ({ chainName, identity, grantId, g
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 };
 
