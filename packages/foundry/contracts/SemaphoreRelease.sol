@@ -43,7 +43,7 @@ contract SemaphoreRelease is BaseHook {
   }
 
   /**
-   * @notice (uin256 groupId, uint32 threshold, string title, string description, string externalURI, string imageURI)
+   * @notice (uint256 groupId, uint32 threshold, string title, string description, string externalURI, string imageURI)
    */
   function beforeWrite(
     address caller,
